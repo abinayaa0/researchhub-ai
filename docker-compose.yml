@@ -1,0 +1,58 @@
+version: "3.9"  #which version the compose file formt is bseing used
+#everything under services is a differnet container
+#defining 3 containers:app, postgres,redis
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000" #hostprt:container_port format.
+      #whatevers running on port 8000 inside the container is reachable at localhost 8000 on your actual laptop
+    volumes:
+      - papers_storage:/app/storage/papers
+      - "./app:/app"
+      #maps the local ./app folder to /app inside the container
+      #when we edit the main.py on your laptop , the container sees the change immediately.
+      #no need to rebuild the container every time you change code.
+
+    depends_on: #tells docker start postgres and redis before starting app
+      - postgres
+      - redis
+      - qdrant
+      #Note: this only waits for the container to start not for postgres to be fully ready to accept connections
+
+    environment:
+      #env variables passed into app container.
+      #FastAPI code will read these and know how to connect to Ppostgres/Redis.
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - REDIS_URL=redis://redis:6379/0
+      - QDRANT_URL=http://qdrant:6333
+      - SECRET_KEY=${SECRET_KEY}
+
+    
+  postgres:
+  #here image instead of build because: pull this pre made image from dockerhub
+    image: postgres:16 #pg16 for storing pgvector extension
+    ports:
+      - "5432:5432"  #same 
+    environment: #special env variables 
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:  #without thisevery time you stop and restart the container, your database data would disappear, because containers are normally wiped clean on restart.
+      - pg_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+  qdrant:
+    image: qdrant/qdrant:latest
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+volumes:
+  pg_data:
+  qdrant_data:
+  papers_storage:
