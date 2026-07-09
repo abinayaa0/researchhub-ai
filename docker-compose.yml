@@ -18,7 +18,7 @@ services:
       - postgres
       - redis
       - qdrant
-      - grobid
+      
       #Note: this only waits for the container to start not for postgres to be fully ready to accept connections
 
     environment:
@@ -52,10 +52,7 @@ services:
       - "6333:6333"
     volumes:
       - qdrant_data:/qdrant/storage
-  grobid:
-    image: grobid/grobid:0.8.0
-    ports:
-      - "8070:8070"
+  
 
 volumes:
   pg_data:
