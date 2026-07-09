@@ -1,6 +1,7 @@
 __pycache__/
 *.pyc
 .env
-.venv/
+venv/
 *.egg-info/
 storage/
+parser_outputs/
