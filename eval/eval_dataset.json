@@ -1,0 +1,177 @@
+[
+  {
+    "id": "q01",
+    "difficulty": "easy",
+    "question": "What is the name of the model architecture proposed in this paper?",
+    "ground_truth": "The Transformer.",
+    "source_section": "Abstract"
+  },
+  {
+    "id": "q02",
+    "difficulty": "easy",
+    "question": "What BLEU score did the Transformer (big) model achieve on the WMT 2014 English-to-German translation task?",
+    "ground_truth": "28.4 BLEU.",
+    "source_section": "Abstract / 6.1 Machine Translation"
+  },
+  {
+    "id": "q03",
+    "difficulty": "easy",
+    "question": "What BLEU score did the Transformer (big) model achieve on the WMT 2014 English-to-French translation task?",
+    "ground_truth": "41.0 BLEU.",
+    "source_section": "Abstract / 6.1 Machine Translation"
+  },
+  {
+    "id": "q04",
+    "difficulty": "easy",
+    "question": "How many identical layers make up the encoder stack?",
+    "ground_truth": "N = 6 identical layers.",
+    "source_section": "3.1 Encoder and Decoder Stacks"
+  },
+  {
+    "id": "q05",
+    "difficulty": "easy",
+    "question": "How many identical layers make up the decoder stack?",
+    "ground_truth": "N = 6 identical layers.",
+    "source_section": "3.1 Encoder and Decoder Stacks"
+  },
+  {
+    "id": "q06",
+    "difficulty": "easy",
+    "question": "How many parallel attention heads does the Transformer use in its base configuration?",
+    "ground_truth": "8 parallel attention layers (heads).",
+    "source_section": "3.2.2 Multi-Head Attention"
+  },
+  {
+    "id": "q07",
+    "difficulty": "easy",
+    "question": "What is the dimensionality of the model's embeddings (dmodel) in the base configuration?",
+    "ground_truth": "512.",
+    "source_section": "3.1 Encoder and Decoder Stacks"
+  },
+  {
+    "id": "q08",
+    "difficulty": "easy",
+    "question": "What optimizer was used to train the model?",
+    "ground_truth": "The Adam optimizer.",
+    "source_section": "5.3 Optimizer"
+  },
+  {
+    "id": "q09",
+    "difficulty": "easy",
+    "question": "How many GPUs were used to train the models, and what type?",
+    "ground_truth": "8 NVIDIA P100 GPUs.",
+    "source_section": "5.2 Hardware and Schedule"
+  },
+  {
+    "id": "q10",
+    "difficulty": "easy",
+    "question": "How long did the big Transformer model train for?",
+    "ground_truth": "300,000 steps, or about 3.5 days.",
+    "source_section": "5.2 Hardware and Schedule"
+  },
+  {
+    "id": "q11",
+    "difficulty": "medium",
+    "question": "What is the name given to the attention mechanism used in the Transformer, and what is its scaling factor?",
+    "ground_truth": "Scaled Dot-Product Attention; the dot products are scaled by a factor of 1/sqrt(dk), where dk is the dimension of the keys.",
+    "source_section": "3.2.1 Scaled Dot-Product Attention"
+  },
+  {
+    "id": "q12",
+    "difficulty": "medium",
+    "question": "Why does the Transformer scale the dot products by 1/sqrt(dk) instead of using unscaled dot-product attention?",
+    "ground_truth": "For large values of dk, the dot products grow large in magnitude, which pushes the softmax function into regions with extremely small gradients. Scaling by 1/sqrt(dk) counteracts this effect.",
+    "source_section": "3.2.1 Scaled Dot-Product Attention"
+  },
+  {
+    "id": "q13",
+    "difficulty": "medium",
+    "question": "What are the three different ways multi-head attention is used in the Transformer model?",
+    "ground_truth": "1) Encoder-decoder attention layers, where queries come from the decoder and keys/values come from the encoder output. 2) Self-attention layers in the encoder, where queries, keys, and values all come from the previous encoder layer. 3) Self-attention layers in the decoder, which allow each position to attend to all positions up to and including that position, with masking to preserve the auto-regressive property.",
+    "source_section": "3.2.3 Applications of Attention in our Model"
+  },
+  {
+    "id": "q14",
+    "difficulty": "medium",
+    "question": "What type of positional encoding does the Transformer use, and why was this choice made over learned positional embeddings?",
+    "ground_truth": "Sine and cosine functions of different frequencies. The sinusoidal version was chosen because it may allow the model to extrapolate to sequence lengths longer than those encountered during training, even though learned positional embeddings produced nearly identical results.",
+    "source_section": "3.5 Positional Encoding"
+  },
+  {
+    "id": "q15",
+    "difficulty": "medium",
+    "question": "What is the computational complexity per layer of a self-attention layer compared to a recurrent layer, according to Table 1?",
+    "ground_truth": "Self-attention has a complexity of O(n^2 * d) per layer, while a recurrent layer has O(n * d^2), where n is sequence length and d is representation dimension.",
+    "source_section": "3.5 Positional Encoding (Table 1) / 4 Why Self-Attention"
+  },
+  {
+    "id": "q16",
+    "difficulty": "medium",
+    "question": "What are the three types of regularization employed during training?",
+    "ground_truth": "Residual dropout, dropout applied to the sums of embeddings and positional encodings, and label smoothing.",
+    "source_section": "5.4 Regularization"
+  },
+  {
+    "id": "q17",
+    "difficulty": "medium",
+    "question": "How does the learning rate schedule change over the course of training?",
+    "ground_truth": "The learning rate increases linearly for the first warmup_steps (4000) training steps, then decreases proportionally to the inverse square root of the step number.",
+    "source_section": "5.3 Optimizer"
+  },
+  {
+    "id": "q18",
+    "difficulty": "medium",
+    "question": "What effect does reducing the attention key size (dk) have on model quality, according to the ablation results?",
+    "ground_truth": "Reducing the attention key size dk hurts model quality, suggesting that determining compatibility between queries and keys is not easy, and a more sophisticated compatibility function than dot product may be beneficial.",
+    "source_section": "6.2 Model Variations"
+  },
+  {
+    "id": "q19",
+    "difficulty": "medium",
+    "question": "What beam search parameters were used during inference?",
+    "ground_truth": "A beam size of 4 and a length penalty of alpha = 0.6.",
+    "source_section": "6.1 Machine Translation"
+  },
+  {
+    "id": "q20",
+    "difficulty": "hard",
+    "question": "Why does the paper argue that self-attention is advantageous over convolutional layers for connecting distant positions in a sequence?",
+    "ground_truth": "A single convolutional layer with kernel width k < n does not connect all pairs of input and output positions, requiring a stack of O(n/k) convolutional layers (or O(log_k(n)) for dilated convolutions) to do so, which increases the length of the longest paths between positions. Self-attention connects all positions with a constant number of sequentially executed operations, giving it a shorter maximum path length.",
+    "source_section": "4 Why Self-Attention"
+  },
+  {
+    "id": "q21",
+    "difficulty": "hard",
+    "question": "What three desiderata motivate the use of self-attention over recurrent and convolutional layers, according to Section 4?",
+    "ground_truth": "1) The total computational complexity per layer. 2) The amount of computation that can be parallelized, measured by the minimum number of sequential operations required. 3) The path length between long-range dependencies in the network, since shorter paths make it easier to learn long-range dependencies.",
+    "source_section": "4 Why Self-Attention"
+  },
+  {
+    "id": "q22",
+    "difficulty": "hard",
+    "question": "How does the paper justify sharing the weight matrix between the embedding layers and the pre-softmax linear transformation?",
+    "ground_truth": "The paper shares the same weight matrix between the two embedding layers and the pre-softmax linear transformation, similar to prior work (Press and Wolf), and multiplies the embedding weights by sqrt(dmodel).",
+    "source_section": "3.4 Embeddings and Softmax"
+  },
+  {
+    "id": "q23",
+    "difficulty": "hard",
+    "question": "What tradeoff does the paper describe between separable convolutions and the self-attention + feed-forward approach used in the Transformer?",
+    "ground_truth": "Separable convolutions decrease complexity to O(k*n*d + n*d^2). Even with k = n, the complexity of a separable convolution is equal to the combination of a self-attention layer and a point-wise feed-forward layer, which is the approach the Transformer takes.",
+    "source_section": "4 Why Self-Attention"
+  },
+  {
+    "id": "q24",
+    "difficulty": "hard",
+    "question": "According to the model variation results in Table 3, what happens to model quality when the number of attention heads is reduced to a single head?",
+    "ground_truth": "Single-head attention is 0.9 BLEU worse than the best multi-head setting; quality also drops off if too many heads are used.",
+    "source_section": "6.2 Model Variations"
+  },
+  {
+    "id": "q25",
+    "difficulty": "hard",
+    "question": "What future research directions does the paper propose beyond text-based sequence transduction?",
+    "ground_truth": "The authors plan to extend the Transformer to problems involving input and output modalities other than text, and to investigate local, restricted attention mechanisms to efficiently handle large inputs and outputs such as images, audio, and video. They also mention making generation less sequential as a research goal.",
+    "source_section": "7 Conclusion"
+  }
+]
