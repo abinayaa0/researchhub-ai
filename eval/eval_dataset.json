@@ -173,5 +173,126 @@
     "question": "What future research directions does the paper propose beyond text-based sequence transduction?",
     "ground_truth": "The authors plan to extend the Transformer to problems involving input and output modalities other than text, and to investigate local, restricted attention mechanisms to efficiently handle large inputs and outputs such as images, audio, and video. They also mention making generation less sequential as a research goal.",
     "source_section": "7 Conclusion"
+  },
+  {
+    "id": "q26",
+    "difficulty": "easy",
+    "question": "What does BERT stand for?",
+    "ground_truth": "Bidirectional Encoder Representations from Transformers.",
+    "source_section": "BERT paper, Abstract/Introduction"
+  },
+  {
+    "id": "q27",
+    "difficulty": "easy",
+    "question": "What two unsupervised tasks does BERT use for pretraining?",
+    "ground_truth": "Masked Language Model (MLM) and Next Sentence Prediction (NSP).",
+    "source_section": "BERT paper, Section 3 Pretraining"
+  },
+  {
+    "id": "q28",
+    "difficulty": "medium",
+    "question": "Why is BERT described as 'deeply bidirectional' compared to previous language representation models?",
+    "ground_truth": "Unlike previous models (like left-to-right language models or shallow concatenation of independently trained left-to-right and right-to-left models), BERT is trained to jointly condition on both left and right context in all layers, using the masked language model pretraining objective.",
+    "source_section": "BERT paper, Introduction"
+  },
+  {
+    "id": "q29",
+    "difficulty": "easy",
+    "question": "What does RoBERTa change compared to the original BERT training procedure?",
+    "ground_truth": "RoBERTa modifies key hyperparameters in BERT, including training the model longer, with bigger batches, over more data; removing the Next Sentence Prediction objective; training on longer sequences; and dynamically changing the masking pattern applied to the training data.",
+    "source_section": "RoBERTa paper, Abstract"
+  },
+  {
+    "id": "q30",
+    "difficulty": "hard",
+    "question": "What is the key difference between BERT's and RoBERTa's approach to the Next Sentence Prediction (NSP) objective?",
+    "ground_truth": "BERT uses NSP as one of its two pretraining objectives, believing it necessary for good performance on downstream tasks. RoBERTa's ablation studies found that removing the NSP loss matches or slightly improves performance on downstream tasks, so RoBERTa removes NSP from pretraining entirely.",
+    "source_section": "RoBERTa paper vs. BERT paper (cross-paper comparison)"
+  },
+  {
+    "id": "q31",
+    "difficulty": "hard",
+    "question": "How does RoBERTa's masking strategy differ from BERT's during pretraining?",
+    "ground_truth": "BERT uses static masking, where the masking pattern is generated once during data preprocessing. RoBERTa uses dynamic masking, generating a new masking pattern each time a sequence is fed into the model, so the model sees different masks across training epochs.",
+    "source_section": "RoBERTa paper, Section 4.1"
+  },
+  {
+    "id": "q32",
+    "difficulty": "easy",
+    "question": "What is GPT-2 trained to do, according to the paper's framing?",
+    "ground_truth": "GPT-2 is trained as a language model to predict the next word given all previous words in a text, and the paper demonstrates that language models can perform downstream tasks in a zero-shot setting without explicit supervision.",
+    "source_section": "GPT-2 paper, Abstract"
+  },
+  {
+    "id": "q33",
+    "difficulty": "medium",
+    "question": "What dataset was used to train GPT-2, and how was it constructed?",
+    "ground_truth": "GPT-2 was trained on WebText, a new dataset of millions of webpages created by scraping outbound links from Reddit that received at least 3 karma, as a heuristic indicator of document quality or interest.",
+    "source_section": "GPT-2 paper, Section 2.2"
+  },
+  {
+    "id": "q34",
+    "difficulty": "easy",
+    "question": "How does the Vision Transformer (ViT) process an image as input to a Transformer?",
+    "ground_truth": "ViT splits an image into fixed-size patches, linearly embeds each patch, adds position embeddings, and feeds the resulting sequence of vectors into a standard Transformer encoder.",
+    "source_section": "ViT paper, Abstract/Section 3"
+  },
+  {
+    "id": "q35",
+    "difficulty": "medium",
+    "question": "How does the Vision Transformer's performance compare to convolutional neural networks when trained on smaller datasets?",
+    "ground_truth": "When trained on smaller datasets, ViT yields modest accuracies below comparable-sized ResNets, because Transformers lack some of the inductive biases inherent to CNNs, such as translation equivariance and locality. However, when trained on large datasets, ViT achieves excellent results and outperforms CNNs.",
+    "source_section": "ViT paper, Abstract/Introduction"
+  },
+  {
+    "id": "q36",
+    "difficulty": "hard",
+    "question": "What architectural inductive biases does the Vision Transformer lack compared to convolutional neural networks like ResNet, and how does this affect its data requirements?",
+    "ground_truth": "ViT lacks the inductive biases inherent to CNNs, such as translation equivariance and locality, that are baked in throughout a CNN's architecture via convolutional filters. Because of this, ViT does not generalize as well when trained on insufficient data, and requires large-scale training data to outperform CNNs like ResNet.",
+    "source_section": "ViT paper vs. ResNet paper (cross-paper comparison)"
+  },
+  {
+    "id": "q37",
+    "difficulty": "easy",
+    "question": "What problem does the residual connection in ResNet aim to solve?",
+    "ground_truth": "Residual connections address the degradation problem, where accuracy gets saturated and then degrades rapidly as network depth increases, even though this degradation is not caused by overfitting. Residual learning makes it easier to optimize very deep networks.",
+    "source_section": "ResNet paper, Abstract/Introduction"
+  },
+  {
+    "id": "q38",
+    "difficulty": "medium",
+    "question": "How does a residual block in ResNet modify what a stack of layers is trained to learn?",
+    "ground_truth": "Instead of directly fitting a desired underlying mapping H(x), the stacked layers are explicitly made to fit a residual mapping F(x) = H(x) - x, and the original mapping is recast as F(x) + x, implemented via 'shortcut connections' that perform identity mapping.",
+    "source_section": "ResNet paper, Section 3.1"
+  },
+  {
+    "id": "q39",
+    "difficulty": "hard",
+    "question": "Does the paper on residual learning (ResNet) use any form of attention mechanism in its architecture?",
+    "ground_truth": "No. ResNet's architecture is based on convolutional layers with residual/shortcut connections; it does not use any attention mechanism. Attention-based architectures like the Transformer were introduced in later work.",
+    "source_section": "ResNet paper (negative/distractor check against Transformer-family papers)"
+  },
+  {
+    "id": "q40",
+    "difficulty": "hard",
+    "question": "Both BERT and GPT-2 are built on Transformer architectures, but they use different halves of the original Transformer. Which part does each use, and what does this imply about how they process text?",
+    "ground_truth": "BERT uses the Transformer encoder, allowing it to attend bidirectionally to context on both sides of a token, making it well-suited for understanding tasks. GPT-2 uses the Transformer decoder, which is autoregressive and attends only to previous tokens, making it well-suited for text generation, predicting the next token given prior context.",
+    "source_section": "BERT paper vs. GPT-2 paper vs. Attention Is All You Need (cross-paper comparison)"
+  },
+  {
+    "id": "q41",
+    "difficulty": "medium",
+    "question": "Does the Vision Transformer paper use any convolutional layers in its main architecture?",
+    "ground_truth": "The core ViT architecture applies a standard Transformer directly to sequences of image patches, without convolutional layers in the main model (aside from the patch embedding step, which can be implemented as a linear projection rather than a convolution).",
+    "source_section": "ViT paper, Section 3"
+  },
+  {
+    "id": "q42",
+    "difficulty": "medium",
+    "question": "What evaluation benchmark suite is commonly referenced in the BERT paper to demonstrate its downstream task performance?",
+    "ground_truth": "The GLUE (General Language Understanding Evaluation) benchmark.",
+    "source_section": "BERT paper, Section 4 (Experiments)"
   }
+
 ]
+

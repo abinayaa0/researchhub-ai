@@ -2,19 +2,30 @@
 Run the full RAG pipeline against the eval dataset and score it with RAGAS.
 Computes: context precision, context recall, faithfulness, answer relevancy.
 """
-from ragas.run_config import RunConfig
+from ragas.run_config import RunConfig 
+"""
+ragas is a python library that internally makes LLM calls.
+RunConfig tells ragas timout, retries , concurrency its like configuring an HTTP client.
+
+"""
 import os
-os.environ["USE_TF"] = "0"
+os.environ["USE_TF"] = "0" #disabling tensorflow for faster imports 
+
 
 import json
 import sys
 
 # Allow importing from scripts/ folder
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "scripts"))
+sys.path.append(
+    os.path.join(
+        os.path.dirname(__file__), "..", "scripts"))
 
 from dotenv import load_dotenv
 load_dotenv()
+"""
+flagembedding is a python library dev bby BAAI provides models for embeddings, reranking and retreival
 
+"""
 from FlagEmbedding import BGEM3FlagModel, FlagReranker
 from qdrant_client import QdrantClient
 from groq import Groq
@@ -54,19 +65,28 @@ def generate_answer(query: str, ranked_chunks: list) -> str:
     return response.choices[0].message.content
 
 
+
 def run_pipeline_on_eval_set(embed_model, reranker, client, eval_items: list) -> dict:
     """Run every eval question through the real pipeline, collect results for RAGAS."""
     questions, answers, contexts, ground_truths = [], [], [], []
 
     for item in eval_items:
-        query = item["question"]
-        print(f"Running: {item['id']} — {query}")
+        query = item["question"] #extract the question.
+        print(f"Running: {item['id']} — {query}") #prints progress
 
         candidates = hybrid_search(client, embed_model, query)
-        ranked_chunks = rerank(reranker, query, candidates)
+        ranked_chunks = rerank(reranker, query, candidates) 
+        """
+        each row is called a point in Qdrant.
+        ID=unique identifier.
+        vector=this is the embedding for similarity search
+        payload=extra info (metadata) stored alongside the vector.
+        payload is not for vector similarity it stores so that we can retreive it later.
 
+        """
         context_texts = [c.payload.get("text", "") for c, score in ranked_chunks]
         answer = generate_answer(query, ranked_chunks)
+        #generate_answer uses llama
 
         questions.append(query)
         answers.append(answer)
@@ -103,7 +123,7 @@ if __name__ == "__main__":
 
     print("\nSetting up RAGAS evaluator (using Groq as judge LLM)...")
     judge_llm = LangchainLLMWrapper(
-        ChatGroq(model="llama-3.3-70b-versatile", api_key=os.getenv("GROQ_API_KEY"))
+        ChatGroq(model="llama-3.1-8b-instant", api_key=os.getenv("GROQ_API_KEY"))
     )
     judge_embeddings = HuggingFaceEmbeddings(model_name="BAAI/bge-small-en-v1.5")
 
@@ -113,6 +133,18 @@ if __name__ == "__main__":
     max_wait=90,
     max_workers=1,
 )
+    """
+    timeout: how many seconds ragas will wait for a single LLM call to respond before giving up adn treating as failed.
+    we need this cuz it llm can freeze under load and jeopardize the whole thing.
+    max_retries: if a call fails(due to some error) it will retry
+    max_wait: waiting time in between the retry attempts. works with something called exponential backoff.
+    exponentital backoff : after each failure it will wait a lil longer before retying (1-->2 --> 4 --> 8)
+    max_workers=1: as covered how many calls run in parallel 1 means fully sequetnial.
+    
+
+
+
+    """
 
     print("Running RAGAS evaluation (this may take a few minutes)...\n")
     eval_result = evaluate(
