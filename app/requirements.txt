@@ -9,3 +9,6 @@ python-multipart==0.0.*
 pydantic-settings==2.6.*
 email-validator==2.2.*
 requests==2.32.*
+FlagEmbedding==1.2.10
+qdrant-client
+groq==0.11.*

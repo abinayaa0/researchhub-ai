@@ -28,3 +28,17 @@ class PaperOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class QueryRequest(BaseModel):
+    question: str
+
+class SourceOut(BaseModel):
+    citation_number: int
+    paper_title: str | None
+    section_title: str | None
+    page_number: int | None
+
+class QueryResponse(BaseModel):
+    answer: str
+    sources: list[SourceOut]
