@@ -42,3 +42,4 @@ class SourceOut(BaseModel):
 class QueryResponse(BaseModel):
     answer: str
     sources: list[SourceOut]
+

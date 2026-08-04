@@ -28,6 +28,7 @@ class Paper(Base):
     filename = Column(String, nullable=False)
     storage_path = Column(String, nullable=False)
     status = Column(String, default="uploaded")
+    qdrant_paper_id = Column(String, nullable=True, index=True)  # NEW — links to Qdrant's paper_id payload
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 """

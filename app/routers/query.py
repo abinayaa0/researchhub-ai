@@ -17,7 +17,7 @@ def query_papers(
     db: Session = Depends(get_db),
 ):
     user_papers = db.query(Paper).filter(Paper.user_id == current_user.id).all()
-    paper_ids = [str(p.id) for p in user_papers]
+    paper_ids = [p.qdrant_paper_id for p in user_papers if p.qdrant_paper_id]
 
     result = rag_pipeline.answer_query(request.question, paper_ids)
     return result

@@ -1,7 +1,7 @@
 import os
-from FlagEmbedding import BGEM3FlagModel, FlagReranker
+import cohere
 from qdrant_client import QdrantClient
-from qdrant_client.models import Prefetch, FusionQuery, Fusion, Filter, FieldCondition, MatchValue
+from qdrant_client.models import Filter, FieldCondition, MatchValue
 from groq import Groq
 
 COLLECTION_NAME = "paper_chunks"
@@ -9,28 +9,22 @@ QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
 RETRIEVE_K = 20
 RERANK_TOP_K = 5
 
-# Loaded once, at module import time (i.e., once when the app starts)
-print("Loading BGE-M3 embedding model...")
-embed_model = BGEM3FlagModel("BAAI/bge-m3", use_fp16=True)
-
-print("Loading bge-reranker-v2-m3...")
-reranker = FlagReranker("BAAI/bge-reranker-v2-m3", use_fp16=True)
-
+cohere_client = cohere.Client(os.getenv("COHERE_API_KEY"))
 qdrant_client = QdrantClient(url=QDRANT_URL)
 groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 
-def embed_query(query: str):
-    output = embed_model.encode([query], return_dense=True, return_sparse=True)
-    dense_vec = output["dense_vecs"][0].tolist()
-    sparse = output["lexical_weights"][0]
-    sparse_indices = [int(k) for k in sparse.keys()]
-    sparse_values = [float(v) for v in sparse.values()]
-    return dense_vec, sparse_indices, sparse_values
+def embed_texts(texts: list[str], input_type: str) -> list[list[float]]:
+    response = cohere_client.embed(
+        texts=texts,
+        model="embed-english-v3.0",
+        input_type=input_type,
+    )
+    return response.embeddings
 
 
-def hybrid_search(query: str, paper_ids: list[str], top_k: int = RETRIEVE_K):
-    dense_vec, sparse_indices, sparse_values = embed_query(query)
+def dense_search(query: str, paper_ids: list[str], top_k: int = RETRIEVE_K):
+    query_vec = embed_texts([query], input_type="search_query")[0]
 
     paper_filter = Filter(
         should=[FieldCondition(key="paper_id", match=MatchValue(value=pid)) for pid in paper_ids]
@@ -38,11 +32,9 @@ def hybrid_search(query: str, paper_ids: list[str], top_k: int = RETRIEVE_K):
 
     results = qdrant_client.query_points(
         collection_name=COLLECTION_NAME,
-        prefetch=[
-            Prefetch(query=dense_vec, using="dense", limit=20, filter=paper_filter),
-            Prefetch(query={"indices": sparse_indices, "values": sparse_values}, using="sparse", limit=20, filter=paper_filter),
-        ],
-        query=FusionQuery(fusion=Fusion.RRF),
+        query=query_vec,
+        using="dense",
+        query_filter=paper_filter,
         limit=top_k,
         with_payload=True,
     )
@@ -52,25 +44,22 @@ def hybrid_search(query: str, paper_ids: list[str], top_k: int = RETRIEVE_K):
 def rerank_chunks(query: str, candidates: list, top_k: int = RERANK_TOP_K):
     if not candidates:
         return []
-    pairs = [[query, c.payload.get("text", "")] for c in candidates]
-    scores = reranker.compute_score(pairs, normalize=True)
-    if not isinstance(scores, list):
-        scores = [scores]
-    scored = list(zip(candidates, scores))
-    scored.sort(key=lambda x: x[1], reverse=True)
-    return scored[:top_k]
+    docs = [c.payload.get("text", "") for c in candidates]
+    response = cohere_client.rerank(
+        query=query,
+        documents=docs,
+        top_n=min(top_k, len(docs)),
+        model="rerank-english-v3.0",
+    )
+    return [(candidates[r.index], r.relevance_score) for r in response.results]
 
 
 def build_prompt(query: str, ranked_chunks: list) -> str:
     context_blocks = []
     for i, (point, score) in enumerate(ranked_chunks):
         payload = point.payload
-        section = payload.get("section_title", "Unknown section")
-        page = payload.get("page_number", "?")
-        paper_title = payload.get("paper_title", "Unknown paper")
-        text = payload.get("text", "")
         context_blocks.append(
-            f"[{i+1}] (Paper: \"{paper_title}\", Section: \"{section}\", Page {page})\n{text}"
+            f"[{i+1}] (Paper: \"{payload.get('paper_title')}\", Section: \"{payload.get('section_title')}\", Page {payload.get('page_number')})\n{payload.get('text', '')}"
         )
     context = "\n\n".join(context_blocks)
 
@@ -103,8 +92,7 @@ def generate_answer(query: str, ranked_chunks: list) -> str:
 
 
 def answer_query(query: str, paper_ids: list[str]) -> dict:
-    """Full pipeline: hybrid search -> rerank -> generate. Returns answer + sources."""
-    candidates = hybrid_search(query, paper_ids)
+    candidates = dense_search(query, paper_ids)
     ranked_chunks = rerank_chunks(query, candidates)
     answer = generate_answer(query, ranked_chunks)
 
@@ -112,10 +100,9 @@ def answer_query(query: str, paper_ids: list[str]) -> dict:
         {
             "citation_number": i + 1,
             "paper_title": point.payload.get("paper_title"),
-            "section_title": point.pooayload.get("section_title"),
+            "section_title": point.payload.get("section_title"),
             "page_number": point.payload.get("page_number"),
         }
         for i, (point, score) in enumerate(ranked_chunks)
     ]
-
     return {"answer": answer, "sources": sources}
